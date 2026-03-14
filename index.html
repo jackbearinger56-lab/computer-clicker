@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Computer Clicker</title>
+
+<style>
+
+body{
+background:#1e1e2f;
+color:white;
+font-family:Arial;
+text-align:center;
+margin-top:60px;
+}
+
+#computer{
+font-size:90px;
+cursor:pointer;
+user-select:none;
+}
+
+#computer:active{
+transform:scale(0.9);
+}
+
+button{
+padding:10px 18px;
+margin:6px;
+border:none;
+border-radius:6px;
+background:#4CAF50;
+color:white;
+font-size:15px;
+cursor:pointer;
+}
+
+.particle{
+position:absolute;
+font-size:18px;
+pointer-events:none;
+animation:fly 1s forwards;
+}
+
+@keyframes fly{
+0%{opacity:1;transform:translate(0,0)}
+100%{opacity:0;transform:translate(var(--x),var(--y))}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>💻 Computer Clicker</h1>
+
+<h2>Chips: <span id="score">0</span></h2>
+<h3>Per Click: <span id="power">1</span></h3>
+
+<div id="computer" onclick="clickComputer(event)">
+💻
+</div>
+
+<h2>Upgrades</h2>
+
+<button id="cpuBtn" onclick="buyCPU()">Better CPU (Cost: 20)</button>
+<button id="gpuBtn" onclick="buyGPU()">GPU Upgrade (Cost: 100)</button>
+<button id="serverBtn" onclick="buyServer()">Server Rack (Cost: 500)</button>
+<button id="dataBtn" onclick="buyDatacenter()">Data Center (Cost: 2000)</button>
+
+<h2>Auto Miners</h2>
+
+<button id="autoBtn" onclick="buyAuto()">Auto Computer (Cost: 150)</button>
+
+<h3>Danger Zone</h3>
+
+<button onclick="resetGame()" style="background:#cc3333">
+Reset Progress
+</button>
+
+<script>
+
+let score = 0
+let power = 1
+let auto = 0
+
+let cpuCost = 20
+let gpuCost = 100
+let serverCost = 500
+let datacenterCost = 2000
+let autoCost = 150
+
+function format(num){
+
+if(num >= 1000000) return (num/1000000).toFixed(1)+"M"
+if(num >= 1000) return (num/1000).toFixed(1)+"K"
+
+return Math.floor(num)
+
+}
+
+function updateUI(){
+
+document.getElementById("score").textContent = format(score)
+document.getElementById("power").textContent = power
+
+document.getElementById("cpuBtn").textContent =
+"Better CPU (Cost: "+format(cpuCost)+")"
+
+document.getElementById("gpuBtn").textContent =
+"GPU Upgrade (Cost: "+format(gpuCost)+")"
+
+document.getElementById("serverBtn").textContent =
+"Server Rack (Cost: "+format(serverCost)+")"
+
+document.getElementById("dataBtn").textContent =
+"Data Center (Cost: "+format(datacenterCost)+")"
+
+document.getElementById("autoBtn").textContent =
+"Auto Computer (Cost: "+format(autoCost)+")"
+
+}
+
+function clickComputer(event){
+
+score += power
+createParticles(event)
+updateUI()
+
+}
+
+function createParticles(event){
+
+for(let i=0;i<5;i++){
+
+let chip=document.createElement("div")
+chip.className="particle"
+chip.textContent="💾"
+
+let x=(Math.random()*200-100)+"px"
+let y=(Math.random()*200-100)+"px"
+
+chip.style.setProperty('--x',x)
+chip.style.setProperty('--y',y)
+
+chip.style.left=event.pageX+"px"
+chip.style.top=event.pageY+"px"
+
+document.body.appendChild(chip)
+
+setTimeout(()=>chip.remove(),1000)
+
+}
+
+}
+
+function buyCPU(){
+
+if(score>=cpuCost){
+
+score-=cpuCost
+power+=1
+cpuCost=Math.floor(cpuCost*1.6)
+
+updateUI()
+
+}
+
+}
+
+function buyGPU(){
+
+if(score>=gpuCost){
+
+score-=gpuCost
+power+=5
+gpuCost=Math.floor(gpuCost*1.7)
+
+updateUI()
+
+}
+
+}
+
+function buyServer(){
+
+if(score>=serverCost){
+
+score-=serverCost
+power+=20
+serverCost=Math.floor(serverCost*1.8)
+
+updateUI()
+
+}
+
+}
+
+function buyDatacenter(){
+
+if(score>=datacenterCost){
+
+score-=datacenterCost
+power+=100
+datacenterCost=Math.floor(datacenterCost*2)
+
+updateUI()
+
+}
+
+}
+
+function buyAuto(){
+
+if(score>=autoCost){
+
+score-=autoCost
+auto+=1
+autoCost=Math.floor(autoCost*1.8)
+
+updateUI()
+
+}
+
+}
+
+setInterval(()=>{
+
+score+=auto
+updateUI()
+
+},1000)
+
+function saveGame(){
+
+localStorage.setItem("chips",score)
+localStorage.setItem("power",power)
+localStorage.setItem("auto",auto)
+
+}
+
+function loadGame(){
+
+score=Number(localStorage.getItem("chips"))||0
+power=Number(localStorage.getItem("power"))||1
+auto=Number(localStorage.getItem("auto"))||0
+
+updateUI()
+
+}
+
+setInterval(saveGame,3000)
+
+loadGame()
+
+function resetGame(){
+
+let confirm1 = confirm("Are you sure you want to reset your progress?")
+
+if(confirm1){
+
+let confirm2 = confirm("This will delete EVERYTHING. Are you REALLY sure?")
+
+if(confirm2){
+
+localStorage.clear()
+location.reload()
+
+}
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>
